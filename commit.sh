@@ -1,4 +1,4 @@
 #!/bin/sh
 
-export EDITOR="emacs"
+export EDITOR="vi"
 git commit -a -e "$@"

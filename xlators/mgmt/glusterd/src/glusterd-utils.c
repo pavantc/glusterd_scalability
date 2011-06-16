@@ -142,6 +142,11 @@ glusterd_is_local_addr (char *hostname)
         int32_t         size = 0;
         char            buff[1024] = {0,};
         gf_boolean_t    need_free = _gf_false;
+#ifdef GD_SCALABILITY_TEST
+        dict_t          *options = NULL;
+        data_t          *listen_host_data = NULL;
+        char            *listen_host = NULL;
+#endif
 
         ret = getaddrinfo (hostname, NULL, NULL, &result);
 
@@ -157,6 +162,21 @@ glusterd_is_local_addr (char *hostname)
                         goto out;
         }
 
+#ifdef GD_SCALABILITY_TEST
+        options = THIS->options;
+        listen_host_data = dict_get (options, "transport.socket.bind-address");
+        if (listen_host_data) {
+                listen_host = data_to_str (listen_host_data);
+        } else {
+                listen_host = "zzzzzzz";
+        }
+        if (!strcmp(hostname, listen_host)) { 
+                found = 1;
+        } else {
+                found = 0;
+        }
+        goto out;
+#endif
 
         sd = socket (AF_INET, SOCK_DGRAM, 0);
         if (sd == -1)

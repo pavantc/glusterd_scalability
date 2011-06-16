@@ -428,6 +428,16 @@ client_bind (rpc_transport_t *this,
              int sock)
 {
         int ret = 0;
+#ifdef GD_SCALABILITY_TEST
+        dict_t          *options = NULL;
+        char            *listen_host = NULL;
+
+        options = THIS->options;
+
+        ret = dict_get_str (options, "transport.socket.bind-address", &listen_host);
+        if (ret == 0)
+                inet_aton(listen_host, &((struct sockaddr_in *)sockaddr)->sin_addr);
+#endif  
 
         *sockaddr_len = sizeof (struct sockaddr_in6);
         switch (sockaddr->sa_family)
